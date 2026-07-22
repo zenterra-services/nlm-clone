@@ -240,7 +240,17 @@ def cmd_import(args):
             skipped.append(s)
             log(f"  - skipped (no content): {s['title'][:70]}")
             continue
-        fpath = out_dir / s["content_file"]
+        # A manifest is untrusted input: export folders are portable backups
+        # and may come from someone else. A crafted content_file such as
+        # "../../../.ssh/id_rsa" would otherwise be uploaded to NotebookLM, so
+        # reject anything that escapes the export directory.
+        fpath = (out_dir / s["content_file"]).resolve()
+        if not fpath.is_relative_to(out_dir.resolve()):
+            failed.append((s, f"unsafe content_file path {s['content_file']!r} "
+                              f"escapes the export directory"))
+            log(f"  ! REJECTED unsafe path: {s['content_file']}")
+            save_state(out_dir, state)
+            continue
         try:
             proc = run_nlm(["source", "add", notebook_id, "--file", str(fpath),
                             "--title", s["title"]], profile=args.profile)
