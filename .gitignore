@@ -1,0 +1,46 @@
+# ---------------------------------------------------------------------------
+# PRIVATE DATA — never commit. Everything below contains the *content* of your
+# notebooks, or identifiers pointing at them.
+# ---------------------------------------------------------------------------
+
+# Exported notebook content: full extracted text of every source, plus
+# manifests with titles and URLs. This is the bulk of your private data.
+exports/
+
+# Run logs: notebook titles, source titles, URLs.
+*.log
+
+# Audit reports: titles and URLs of affected sources.
+blocked_sources.md
+*_report.md
+
+# Batch lists: notebook IDs of your own notebooks.
+batch*.txt
+*.ids.txt
+
+# ---------------------------------------------------------------------------
+# Credentials. The nlm CLI stores browser session cookies in
+# ~/.notebooklm-mcp-cli/ (outside this repo) and this toolkit never copies them
+# here. These patterns are belt-and-braces in case a future change or a manual
+# `nlm login --manual -f cookies.json` drops one in the working directory.
+# ---------------------------------------------------------------------------
+auth.json
+cookies.json
+metadata.json
+.env
+*.pem
+*.key
+*_secret*
+*_token*
+credentials*
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+*.egg-info/
