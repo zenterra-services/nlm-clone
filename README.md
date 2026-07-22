@@ -170,6 +170,30 @@ blocked, so many distinct pages collapse onto one title, and notebooks
 legitimately contain the same URL twice. Matching on titles alone will make you
 delete real content.
 
+## Security posture
+
+Static analysis (Bandit, Ruff, Flake8, mypy) is clean. Notes for reviewers:
+
+- **No third-party dependencies.** The toolkit imports only the Python standard
+  library, so there is no dependency CVE surface to audit.
+- **No shell execution.** Every subprocess call passes an argument *list* with
+  `shell=False` (the default), so notebook titles, IDs and URLs cannot be
+  interpreted as shell syntax. Bandit's B404/B603 findings flag the use of
+  `subprocess` itself, not an injection path. There is no `eval`, `exec`, or
+  `shell=True` anywhere.
+- **Export folders are untrusted input.** `manifest.json` drives the import, so
+  a manifest obtained from someone else is attacker-controlled data. Import
+  rejects any `content_file` that resolves outside the export directory —
+  without that check, a crafted manifest could have a file such as
+  `../../../.ssh/id_rsa` uploaded to a NotebookLM notebook. Only import export
+  folders you produced or trust.
+- **Credentials are never handled here** — see
+  [Authentication](#authentication--what-you-need-and-what-this-tool-never-touches).
+- **No network access of its own.** All traffic goes through the `nlm` CLI to
+  NotebookLM; there is no telemetry and no other endpoint.
+
+Found a security issue? Open an issue, or report privately if it is sensitive.
+
 ## Requirements
 
 - Python 3.9+ (no third-party packages)
